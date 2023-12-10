@@ -1,8 +1,9 @@
 import streamlit as st
 import sympy as sp
-from src.gradient_decent import gdm_constant, gdm_exact_line_search, gdm_backtracking
-from src.newton import newton_method
 
+from src.gradient_decent import (gdm_backtracking, gdm_constant,
+                                 gdm_exact_line_search)
+from src.newton import newton_method
 
 st.set_page_config(
     page_title="Optimization"
