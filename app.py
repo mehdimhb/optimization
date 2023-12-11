@@ -1,9 +1,10 @@
 import streamlit as st
 import sympy as sp
 
-from src.gradient_decent import (gdm_backtracking, gdm_constant,
-                                 gdm_exact_line_search)
+from src.gradient_decent import gradient_decent_method
 from src.newton import newton_method
+from src.step_methods import Constant, LineSearch, Backtracking
+
 
 st.set_page_config(
     page_title="Optimization"
@@ -28,15 +29,19 @@ method = st.selectbox("Method", ["Gradient Decent Method", "Newton's Method"])
 if method == "Gradient Decent Method":
     columns = st.columns(2)
     step_size_selection_rule = columns[0].selectbox(
-        "Step Size Selection Rule", ["Constant", "Exact Line Search", "Backtracing"]
+        "Step Size Selection Rule", ["Constant", "Exact Line Search", "Backtracing Line Search"]
     )
     match step_size_selection_rule:
         case "Constant":
             c = columns[1].number_input("Step Size", step=0.001, format="%0.3f")
-        case "Backtracing":
+            step_method = Constant(c)
+        case "Exact Line Search":
+            step_method = LineSearch()
+        case "Backtracing Line Search":
             s = columns[1].number_input("S", min_value=0.0, step=0.001, format="%0.3f")
             alpha = columns[1].slider(r'$\alpha$', 0.0, 1.0, step=0.01)
             beta = columns[1].slider(r'$\beta$', 0.0, 1.0, step=0.01)
+            step_method = Backtracking(s, alpha, beta)
 
 columns = st.columns(2)
 tolerance = columns[0].number_input("Tolerance (1-eN)", 1, value=5)
@@ -48,13 +53,7 @@ if st.button("Run", type="primary"):
     with st.spinner('Calculating...'):
         match method:
             case "Gradient Decent Method":
-                match step_size_selection_rule:
-                    case "Constant":
-                        result = gdm_constant(function, x0, c, tolerance, maximum_iteration)
-                    case "Exact Line Search":
-                        result = gdm_exact_line_search(function, x0, tolerance, maximum_iteration)
-                    case "Backtracing":
-                        result = gdm_backtracking(function, x0, s, alpha, beta, tolerance, maximum_iteration)
+                result = gradient_decent_method(function, x0, step_method, tolerance, maximum_iteration)
             case "Newton's Method":
                 result = newton_method(function, x0, tolerance, maximum_iteration)
     if len(result) == 1:

@@ -24,7 +24,7 @@ def newton_method(expression, x0, tolerance=1e-5, maximum_iteration=10000):
     f = function(expression)
     grad = gradient(expression)
     hess_inv = hessian_inverse(expression)
-    
+
     while np.linalg.norm(grad(x)) > tolerance and k < maximum_iteration:
         dk = - np.dot(hess_inv(x), grad(x))
         x = x + dk
