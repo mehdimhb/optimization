@@ -1,9 +1,8 @@
 import streamlit as st
 import sympy as sp
 
-from src.gradient_decent import gradient_decent_method
-from src.newton import newton_method
-from src.step_methods import Constant, LineSearch, Backtracking
+from src.gradient_decent import (gradient_decent_method, newton_method)
+from src.step_methods import (Constant, LineSearch, Backtracking)
 
 
 st.set_page_config(
@@ -26,9 +25,9 @@ if function != "":
 else:
     x0 = [st.text_input(r'$x^{0}$')]
 
-method = st.selectbox("Method", ["Gradient Decent Method", "Newton's Method"])
+method = st.selectbox("Method", ["Gradient Decent Method", "Newton's Method", "Damped Newton's Method"])
 
-if method == "Gradient Decent Method":
+if method == "Gradient Decent Method" or method == "Damped Newton's Method":
     columns = st.columns(2)
     step_size_selection_rule = columns[0].selectbox(
         "Step Size Selection Rule", ["Constant", "Exact Line Search", "Backtracing Line Search"]
@@ -44,6 +43,8 @@ if method == "Gradient Decent Method":
             alpha = columns[1].slider(r'$\alpha$', 0.0, 1.0, step=0.01)
             beta = columns[1].slider(r'$\beta$', 0.0, 1.0, step=0.01)
             step_method = Backtracking(s, alpha, beta)
+    if method == "Gradient Decent Method":
+        scaling = st.toggle(r"use $D_{k}=diag(\nabla^{2}f(x_{k})^{-1})$ as Scaling Matrix")
 
 columns = st.columns(2)
 tolerance = columns[0].number_input("Tolerance (1-eN)", 1, value=5)
@@ -55,9 +56,11 @@ if st.button("Run", type="primary"):
     with st.spinner('Calculating...'):
         match method:
             case "Gradient Decent Method":
-                result = gradient_decent_method(function, x0, step_method, tolerance, maximum_iteration)
+                result = gradient_decent_method(function, x0, step_method, scaling, tolerance, maximum_iteration)
             case "Newton's Method":
-                result = newton_method(function, x0, tolerance, maximum_iteration)
+                result = newton_method(function, x0, None, tolerance, maximum_iteration)
+            case "Damped Newton's Method":
+                result = newton_method(function, x0, step_method, tolerance, maximum_iteration)
     if len(result) == 1:
         st.metric("Optimal Point", result[0][0])
     else:

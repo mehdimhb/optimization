@@ -20,8 +20,8 @@ class LineSearch(Step):
     def __init__(self):
         super().__init__(None, "Exact Line Search")
 
-    def __call__(self, f, grad, x):
-        self.value = line_search(f, grad, x, -grad(x))[0]
+    def __call__(self, f, grad, x, d):
+        self.value = line_search(f, grad, x, d)[0]
         return super().__call__()
 
 
@@ -38,6 +38,6 @@ class Backtracking(Step):
             t *= self.beta
         return t
 
-    def __call__(self, f, grad, x):
-        self.value = self.backtracing_line_search(f, grad, x, -grad(x))
+    def __call__(self, f, grad, x, d):
+        self.value = self.backtracing_line_search(f, grad, x, d)
         return super().__call__()

@@ -30,3 +30,12 @@ def gradient(expression):
 def hessian_inverse(expression):
     hessian_inverse_expression = sp.hessian(expression, variables(expression))**-1
     return make_function(hessian_inverse_expression, variables(expression))
+
+
+def hessian_inverse_diagonal(expression):
+    hessian_inverse_expression = sp.hessian(expression, variables(expression))**-1
+    diagonal_of_hessian_inverse = sp.Matrix(
+        *hessian_inverse_expression.shape,
+        lambda i, j: hessian_inverse_expression[i, j] if i == j else 0
+    )
+    return make_function(diagonal_of_hessian_inverse, variables(expression))
