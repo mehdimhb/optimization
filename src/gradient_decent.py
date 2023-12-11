@@ -10,7 +10,7 @@ def gradient_decent_method(expression, x0, step_method, tolerance, maximum_itera
     Parameters:
     - expression (function): The objective function to be minimized.
     - x0 (array-like): Initial point.
-    - step_method (StepSize): The step size used in each iteration.
+    - step_method (Step): The step size used in each iteration.
     - tolerance (float): The convergence threshold.
     - maximum_iteration (int): The maximum number of iterations.
 

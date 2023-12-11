@@ -12,10 +12,12 @@ st.set_page_config(
 
 st.title("Optimization")
 
-function = st.text_input("Function")
+columns = st.columns(2)
+function = columns[0].text_input("Function")
 
 if function != "":
     function = sp.sympify(function)
+    columns[1].latex(function)
     no_of_variables = len(function.free_symbols)
     columns = st.columns(no_of_variables)
     x0 = []
