@@ -47,3 +47,7 @@ def hessian_inverse_diagonal(expression):
 def convert_array_to_sympy_function(array, expression):
     matrix = sp.sympify(array)
     return make_function(matrix, variables(expression))
+
+
+def is_positive_definite(matrix):
+    return sp.Matrix(matrix).is_positive_definite

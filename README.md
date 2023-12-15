@@ -9,6 +9,7 @@ Explore a selection of implemented methods, including:
 - Scaled Gradient Descent with Diagonal Reversed Hessian and Custom Matrix
 - Newton's Method
 - Damped Newton's Method
+- Hybrid Gradient-Newton Method
 
 ## Installation and Usage
 

@@ -2,7 +2,9 @@ import streamlit as st
 import sympy as sp
 import numpy as np
 
-from src.gradient_decent import (gradient_decent_method, newton_method)
+from src.gradient_decent import (gradient_decent_method,
+                                 newton_method,
+                                 hybrid_gradient_newton_method)
 from src.step_methods import (Constant, LineSearch, Backtracking)
 from src.math_utils import (hessian_inverse_diagonal,
                             hessian_inverse_diagonal_expression,
@@ -30,9 +32,11 @@ if function != "":
 else:
     x0 = [st.text_input(r'$x^{0}$')]
 
-method = st.selectbox("Method", ["Gradient Decent Method", "Newton's Method", "Damped Newton's Method"])
+method = st.selectbox(
+    "Method",
+    ["Gradient Decent Method", "Newton's Method", "Damped Newton's Method", "Hybrid Gradient-Newton Method"])
 
-if method == "Gradient Decent Method" or method == "Damped Newton's Method":
+if method != "Newton's Method":
     columns = st.columns(2)
     step_size_selection_rule = columns[0].selectbox(
         "Step Size Selection Rule", ["Constant", "Exact Line Search", "Backtracing Line Search"]
@@ -69,6 +73,7 @@ if method == "Gradient Decent Method" or method == "Damped Newton's Method":
                                 scale[i, j] = col2[j].text_input(f'x{i+1}{j+1}', label_visibility='hidden')
                         if "" not in scale:
                             col[2].latex(sp.latex(sp.sympify(scale)))
+                            scale = convert_array_to_sympy_function(scale, function)
 
 columns = st.columns(2)
 tolerance = columns[0].number_input("Tolerance (1-eN)", 1, value=5)
@@ -76,9 +81,7 @@ tolerance = float(f"1e-{tolerance}")
 maximum_iteration = columns[1].number_input("Maximum Iteration", min_value=1, value=1000, step=500)
 
 if st.button("Run", type="primary"):
-    x0 = list(map(float, x0))
-    if scale_matrix and scaling_matrix_type == "Custom":
-        scale = convert_array_to_sympy_function(scale, function)
+    x0 = list(map(eval, x0))
     with st.spinner('Calculating...'):
         match method:
             case "Gradient Decent Method":
@@ -87,6 +90,8 @@ if st.button("Run", type="primary"):
                 result = newton_method(function, x0, None, tolerance, maximum_iteration)
             case "Damped Newton's Method":
                 result = newton_method(function, x0, step_method, tolerance, maximum_iteration)
+            case "Hybrid Gradient-Newton Method":
+                result = hybrid_gradient_newton_method(function, x0, step_method, tolerance, maximum_iteration)
     if len(result) == 1:
         st.metric("Optimal Point", result[0][0])
     else:
