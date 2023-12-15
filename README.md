@@ -6,7 +6,7 @@ a Python implementation of various optimization methods for functions using Stre
 
 Explore a selection of implemented methods, including:
 - Gradient Descent with constant, exact line search and backtracing step size
-- Scaled Gradient Descent
+- Scaled Gradient Descent with Diagonal Reversed Hessian and Custom Matrix
 - Newton's Method
 - Damped Newton's Method
 

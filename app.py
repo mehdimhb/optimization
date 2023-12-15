@@ -1,8 +1,12 @@
 import streamlit as st
 import sympy as sp
+import numpy as np
 
 from src.gradient_decent import (gradient_decent_method, newton_method)
 from src.step_methods import (Constant, LineSearch, Backtracking)
+from src.math_utils import (hessian_inverse_diagonal,
+                            hessian_inverse_diagonal_expression,
+                            convert_array_to_sympy_function)
 
 
 st.set_page_config(
@@ -22,6 +26,7 @@ if function != "":
     x0 = []
     for i in range(no_of_variables):
         exec(f"x0.append(columns[{i}].text_input(r'$x_{i+1}^{0}$'))")
+    scale = convert_array_to_sympy_function(np.identity(no_of_variables), function)
 else:
     x0 = [st.text_input(r'$x^{0}$')]
 
@@ -39,12 +44,31 @@ if method == "Gradient Decent Method" or method == "Damped Newton's Method":
         case "Exact Line Search":
             step_method = LineSearch()
         case "Backtracing Line Search":
-            s = columns[1].number_input("S", min_value=0.0, step=0.001, format="%0.3f")
+            s = columns[1].number_input("S", min_value=0.0, step=0.01)
             alpha = columns[1].slider(r'$\alpha$', 0.0, 1.0, step=0.01)
             beta = columns[1].slider(r'$\beta$', 0.0, 1.0, step=0.01)
             step_method = Backtracking(s, alpha, beta)
     if method == "Gradient Decent Method":
-        scaling = st.toggle(r"use $D_{k}=diag(\nabla^{2}f(x_{k})^{-1})$ as Scaling Matrix")
+        col = st.columns([1.5, 2, 2])
+        scale_matrix = col[0].toggle(r"Use Scaling Matrix")
+        if scale_matrix:
+            scaling_matrix_type = col[1].radio(
+                "choose type of Scaling Matrix:", [r"$D_{k}=diag(\nabla^{2}f(x_{k})^{-1})$", "Custom"]
+            )
+            match scaling_matrix_type:
+                case r"$D_{k}=diag(\nabla^{2}f(x_{k})^{-1})$":
+                    if function != "":
+                        col[2].latex(sp.latex(hessian_inverse_diagonal_expression(function)))
+                        scale = hessian_inverse_diagonal(function)
+                case "Custom":
+                    if function != "":
+                        col2 = col[2].columns(no_of_variables)
+                        scale = np.empty((no_of_variables, no_of_variables), dtype="U50")
+                        for i in range(no_of_variables):
+                            for j in range(no_of_variables):
+                                scale[i, j] = col2[j].text_input(f'x{i+1}{j+1}', label_visibility='hidden')
+                        if "" not in scale:
+                            col[2].latex(sp.latex(sp.sympify(scale)))
 
 columns = st.columns(2)
 tolerance = columns[0].number_input("Tolerance (1-eN)", 1, value=5)
@@ -53,10 +77,12 @@ maximum_iteration = columns[1].number_input("Maximum Iteration", min_value=1, va
 
 if st.button("Run", type="primary"):
     x0 = list(map(float, x0))
+    if scale_matrix and scaling_matrix_type == "Custom":
+        scale = convert_array_to_sympy_function(scale, function)
     with st.spinner('Calculating...'):
         match method:
             case "Gradient Decent Method":
-                result = gradient_decent_method(function, x0, step_method, scaling, tolerance, maximum_iteration)
+                result = gradient_decent_method(function, x0, step_method, scale, tolerance, maximum_iteration)
             case "Newton's Method":
                 result = newton_method(function, x0, None, tolerance, maximum_iteration)
             case "Damped Newton's Method":

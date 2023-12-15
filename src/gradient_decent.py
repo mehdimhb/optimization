@@ -1,9 +1,9 @@
 import numpy as np
 
-from src.math_utils import (function, gradient, hessian_inverse, hessian_inverse_diagonal)
+from src.math_utils import (function, gradient, hessian_inverse)
 
 
-def gradient_decent_method(expression, x0, step_method, scaling, tolerance, maximum_iteration):
+def gradient_decent_method(expression, x0, step_method, scale, tolerance, maximum_iteration):
     """
     Performs gradient descent optimization with a given step size method.
 
@@ -25,10 +25,9 @@ def gradient_decent_method(expression, x0, step_method, scaling, tolerance, maxi
     x = np.array(x0)
     f = function(expression)
     grad = gradient(expression)
-    scale = hessian_inverse_diagonal(expression)
 
     while np.linalg.norm(grad(x)) > tolerance and k < maximum_iteration:
-        d = -np.dot(scale(x), grad(x)) if scaling else -grad(x)
+        d = -np.dot(scale(x), grad(x))
         step_size = step_method(f, grad, x, d)
         x = x + step_size * d
         k += 1

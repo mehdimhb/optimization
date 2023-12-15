@@ -32,10 +32,18 @@ def hessian_inverse(expression):
     return make_function(hessian_inverse_expression, variables(expression))
 
 
-def hessian_inverse_diagonal(expression):
+def hessian_inverse_diagonal_expression(expression):
     hessian_inverse_expression = sp.hessian(expression, variables(expression))**-1
-    diagonal_of_hessian_inverse = sp.Matrix(
+    return sp.Matrix(
         *hessian_inverse_expression.shape,
         lambda i, j: hessian_inverse_expression[i, j] if i == j else 0
     )
-    return make_function(diagonal_of_hessian_inverse, variables(expression))
+
+
+def hessian_inverse_diagonal(expression):
+    return make_function(hessian_inverse_diagonal_expression(expression), variables(expression))
+
+
+def convert_array_to_sympy_function(array, expression):
+    matrix = sp.sympify(array)
+    return make_function(matrix, variables(expression))
