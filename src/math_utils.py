@@ -22,6 +22,13 @@ def function(expression):
     return make_function(expression, variables(expression))
 
 
+def large_input_function(f, X, Y):
+    Z = []
+    for xy in zip(X, Y):
+        Z.append(f(xy))
+    return Z
+
+
 def gradient(expression):
     gradient_expression = sp.Matrix([expression]).jacobian(variables(expression))
     return make_function(gradient_expression, variables(expression))

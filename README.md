@@ -1,6 +1,6 @@
 # Optimization Methods with Python
 
-a Python implementation of various optimization methods for functions using Streamlit.
+a Python implementation of various optimization methods for multidimensional functions using Streamlit with filled and line contour plot of optimization process. 
 
 ## Implemented Methods
 

@@ -25,14 +25,16 @@ def gradient_decent_method(expression, x0, step_method, scale, tolerance, maximu
     x = np.array(x0)
     f = function(expression)
     grad = gradient(expression)
+    points = [x]
 
     while np.linalg.norm(grad(x)) > tolerance and k < maximum_iteration:
         d = -np.dot(scale(x), grad(x))
         step_size = step_method(f, grad, x, d)
         x = x + step_size * d
+        points.append(x)
         k += 1
 
-    return x, f(x), np.linalg.norm(grad(x)), k
+    return x, f(x), np.linalg.norm(grad(x)), k, points
 
 
 def newton_method(expression, x0, step_method, tolerance, maximum_iteration):
@@ -57,14 +59,16 @@ def newton_method(expression, x0, step_method, tolerance, maximum_iteration):
     f = function(expression)
     grad = gradient(expression)
     hess_inv = hessian_inverse(expression)
+    points = [x]
 
     while np.linalg.norm(grad(x)) > tolerance and k < maximum_iteration:
         d = -np.dot(hess_inv(x), grad(x))
         step_size = step_method(f, grad, x, d) if step_method else 1
         x = x + step_size*d
+        points.append(x)
         k += 1
 
-    return x, f(x), np.linalg.norm(grad(x)), k
+    return x, f(x), np.linalg.norm(grad(x)), k, points
 
 
 def hybrid_gradient_newton_method(expression, x0, step_method, tolerance, maximum_iteration):
@@ -89,6 +93,7 @@ def hybrid_gradient_newton_method(expression, x0, step_method, tolerance, maximu
     f = function(expression)
     grad = gradient(expression)
     hess_inv = hessian_inverse(expression)
+    points = [x]
 
     while np.linalg.norm(grad(x)) > tolerance and k < maximum_iteration:
         if is_positive_definite(hess_inv(x)):
@@ -97,6 +102,7 @@ def hybrid_gradient_newton_method(expression, x0, step_method, tolerance, maximu
             d = -grad(x)
         step_size = step_method(f, grad, x, d)
         x = x + step_size * d
+        points.append(x)
         k += 1
 
-    return x, f(x), np.linalg.norm(grad(x)), k
+    return x, f(x), np.linalg.norm(grad(x)), k, points

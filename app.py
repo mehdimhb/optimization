@@ -9,6 +9,7 @@ from src.step_methods import (Constant, LineSearch, Backtracking)
 from src.math_utils import (hessian_inverse_diagonal,
                             hessian_inverse_diagonal_expression,
                             convert_array_to_sympy_function)
+from plot import contour
 
 
 st.set_page_config(
@@ -16,6 +17,8 @@ st.set_page_config(
 )
 
 st.title("Optimization")
+
+st.subheader("Method")
 
 columns = st.columns(2)
 function = columns[0].text_input("Function")
@@ -57,7 +60,7 @@ if method != "Newton's Method":
         scale_matrix = col[0].toggle(r"Use Scaling Matrix")
         if scale_matrix:
             scaling_matrix_type = col[1].radio(
-                "choose type of Scaling Matrix:", [r"$D_{k}=diag(\nabla^{2}f(x_{k})^{-1})$", "Custom"]
+                "Choose Type of Scaling Matrix:", [r"$D_{k}=diag(\nabla^{2}f(x_{k})^{-1})$", "Custom"]
             )
             match scaling_matrix_type:
                 case r"$D_{k}=diag(\nabla^{2}f(x_{k})^{-1})$":
@@ -80,6 +83,19 @@ tolerance = columns[0].number_input("Tolerance (1-eN)", 1, value=5)
 tolerance = float(f"1e-{tolerance}")
 maximum_iteration = columns[1].number_input("Maximum Iteration", min_value=1, value=1000, step=500)
 
+st.subheader("Plot")
+
+if function != "" and no_of_variables == 2:
+    plotting = True
+    columns = st.columns(3)
+    type_of_contour = columns[0].radio("Type", ["Line Contour", "Filled Contour"], index=1)
+    filled = True if type_of_contour == "Filled Contour" else False
+    levels = columns[1].number_input("Levels", 1, value=10, step=1)
+    radius = columns[2].number_input("Radius", 0.01, value=3.00, step=0.01)
+else:
+    plotting = False
+    st.write("Plot is not supported for this function")
+
 if st.button("Run", type="primary"):
     x0 = list(map(eval, x0))
     with st.spinner('Calculating...'):
@@ -101,3 +117,8 @@ if st.button("Run", type="primary"):
     st.metric("Optimal Value", result[1])
     st.metric("Norm of Gradient", result[2])
     st.metric("No of Iteration", result[3])
+
+    if plotting:
+        with st.spinner('Plotting...'):
+            points = [[p[i] for p in result[4] if np.linalg.norm(p-result[0]) < radius] for i in range(no_of_variables)]
+            st.pyplot(contour(function, result[0], radius, levels, filled, points))
