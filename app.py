@@ -82,6 +82,7 @@ columns = st.columns(2)
 tolerance = columns[0].number_input("Tolerance (1-eN)", 1, value=5)
 tolerance = float(f"1e-{tolerance}")
 maximum_iteration = columns[1].number_input("Maximum Iteration", min_value=1, value=1000, step=500)
+is_round = st.checkbox("Round Result According to Tolerance")
 
 st.subheader("Plot")
 
@@ -108,7 +109,17 @@ if st.button("Run", type="primary"):
                 result = newton_method(function, x0, step_method, tolerance, maximum_iteration)
             case "Hybrid Gradient-Newton Method":
                 result = hybrid_gradient_newton_method(function, x0, step_method, tolerance, maximum_iteration)
-    if len(result) == 1:
+    unrounded_result = result
+    if is_round:
+        result = list(result)
+        for i in range(len(result)):
+            result[i] = np.round(result[i], int(-np.log10(tolerance)))
+            if isinstance(result[i], np.ndarray):
+                result[i][result[i] == 0] = 0
+            else:
+                if result[i] == 0:
+                    result[i] = 0
+    if len(result[0]) == 1:
         st.metric("Optimal Point", result[0][0])
     else:
         st.metric(r"Optimal Point: $\\x_{1}$", result[0][0])
@@ -120,5 +131,8 @@ if st.button("Run", type="primary"):
 
     if plotting:
         with st.spinner('Plotting...'):
-            points = [[p[i] for p in result[4] if np.linalg.norm(p-result[0]) < radius] for i in range(no_of_variables)]
-            st.pyplot(contour(function, result[0], radius, levels, filled, points))
+            points = [
+                [p[i] for p in unrounded_result[4] if np.linalg.norm(p-unrounded_result[0]) < radius]
+                for i in range(no_of_variables)
+            ]
+            st.pyplot(contour(function, unrounded_result[0], radius, levels, filled, points))
