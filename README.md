@@ -1,8 +1,8 @@
 # Optimization Methods with Python
 
-A Python implementation of various optimization methods for multidimensional functions using Streamlit with filled and line contour plot of optimization process. It's available online at [Optimization](https://optimization-prg.streamlit.app/)
+A Python implementation of various optimization methods for multidimensional functions using Streamlit with filled and line contour plot of optimization process. It's available online at [Optimization](https://optimization-app.streamlit.app/)
 
-![Optimization Streamlit App](optimization-prg-streamlit-app.png)
+![Optimization Streamlit App](optimization-app-streamlit-app.png)
 
 ## Implemented Methods
 
