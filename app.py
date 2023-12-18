@@ -132,7 +132,7 @@ if st.button("Run", type="primary"):
     if plotting:
         with st.spinner('Plotting...'):
             points = [
-                [p[i] for p in unrounded_result[4] if np.linalg.norm(p-unrounded_result[0]) < radius]
+                [p[i] for p in unrounded_result[4] if np.abs(p-unrounded_result[0]).sum(-1) < 2*radius]
                 for i in range(no_of_variables)
             ]
             st.pyplot(contour(function, unrounded_result[0], radius, levels, filled, points))
