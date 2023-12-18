@@ -2,9 +2,9 @@ import streamlit as st
 import sympy as sp
 import numpy as np
 
-from src.gradient_decent import (gradient_decent_method,
-                                 newton_method,
-                                 hybrid_gradient_newton_method)
+from src.optimization_methods import (gradient_decent_method,
+                                      newton_method,
+                                      hybrid_gradient_newton_method)
 from src.step_methods import (Constant, LineSearch, Backtracking)
 from src.math_utils import (hessian_inverse_diagonal,
                             hessian_inverse_diagonal_expression,
