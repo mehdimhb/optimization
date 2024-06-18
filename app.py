@@ -12,17 +12,20 @@ from src.math_utils import (hessian_inverse_diagonal,
 from plot import contour
 
 
+# Set page title
 st.set_page_config(
     page_title="Optimization"
 )
-
 st.title("Optimization")
 
+# Set subheader for method selection
 st.subheader("Method")
 
+# Get function from user input
 columns = st.columns(2)
 function = columns[0].text_input("Function")
 
+# If function is provided, process it
 if function != "":
     function = sp.sympify(function)
     columns[1].latex(function)
@@ -35,10 +38,12 @@ if function != "":
 else:
     x0 = [st.text_input(r'$x^{0}$')]
 
+# Get method from user input
 method = st.selectbox(
     "Method",
     ["Gradient Decent Method", "Newton's Method", "Damped Newton's Method", "Hybrid Gradient-Newton Method"])
 
+# If method is not Newton's Method, get step size selection rule from user input
 if method != "Newton's Method":
     columns = st.columns(2)
     step_size_selection_rule = columns[0].selectbox(
@@ -46,11 +51,13 @@ if method != "Newton's Method":
     )
     match step_size_selection_rule:
         case "Constant":
+            # Get constant step size from user input
             c = columns[1].number_input("Step Size", step=0.001, format="%0.3f")
             step_method = Constant(c)
         case "Exact Line Search":
             step_method = LineSearch()
         case "Backtracing Line Search":
+            # Get backtracking line search parameters from user input
             s = columns[1].number_input("S", min_value=0.0, step=0.01)
             alpha = columns[1].slider(r'$\alpha$', 0.0, 1.0, step=0.01)
             beta = columns[1].slider(r'$\beta$', 0.0, 1.0, step=0.01)
@@ -78,14 +85,17 @@ if method != "Newton's Method":
                             col[2].latex(sp.latex(sp.sympify(scale)))
                             scale = convert_array_to_sympy_function(scale, function)
 
+# Get tolerance and maximum iteration from user input
 columns = st.columns(2)
-tolerance = columns[0].number_input("Tolerance (1-eN)", 1, value=5)
+tolerance = columns[0].number_input("Tolerance (1e-N)", 1, value=5)
 tolerance = float(f"1e-{tolerance}")
 maximum_iteration = columns[1].number_input("Maximum Iteration", min_value=1, value=1000, step=500)
 is_round = st.checkbox("Round Result According to Tolerance")
 
+# Set subheader for plot
 st.subheader("Plot")
 
+# If function is provided and it is 2D, get plotting parameters from user input
 if function != "" and no_of_variables == 2:
     plotting = True
     columns = st.columns(3)
@@ -97,6 +107,7 @@ else:
     plotting = False
     st.write("Plot is not supported for this function")
 
+# If user clicks "Run" button, run optimization method and get result
 if st.button("Run", type="primary"):
     x0 = list(map(eval, x0))
     with st.spinner('Calculating...'):
